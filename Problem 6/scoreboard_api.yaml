@@ -1,0 +1,103 @@
+openapi: 3.0.0
+info:
+  title: Scoreboard API
+  description: API for updating and retrieving user scores
+  version: 1.0.0
+
+servers:
+  - url: https://api.example.com
+    description: Production Server
+
+paths:
+  /api/score/update:
+    post:
+      summary: Update user score
+      description: Add score after user completes an action.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                score:
+                  type: integer
+      responses:
+        200:
+          description: Score updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+                  new_rank:
+                    type: integer
+        401:
+          description: Unauthorized - Missing or invalid token
+        400:
+          description: Bad Request - Invalid input data
+
+  /api/score/top10:
+    get:
+      summary: Get top 10 scores
+      description: Retrieve the top 10 players with the highest scores.
+      responses:
+        200:
+          description: List of top players
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  top_players:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        user_id:
+                          type: string
+                        score:
+                          type: integer
+
+  /api/score/{user_id}:
+    get:
+      summary: Get user score
+      description: Retrieve score for a specific user.
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: User score retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: string
+                  score:
+                    type: integer
+        404:
+          description: User not found
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - BearerAuth: []
